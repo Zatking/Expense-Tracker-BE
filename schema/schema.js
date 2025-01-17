@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
 
-
-
 // Đây là schema cho tài khoản người dùng
+
 
 const UserSchema = new mongoose.Schema({
     Username:{type:String, required:true},
     Email:{type:String, required:true,match: [/^\S+@\S+\.\S+$/, 'Invalid email format']},
     Password:{type:String, required:true},
     CreatedAt:{type:Date, default:Date.now},
+    Income: {type:mongoose.Schema.Types.ObjectId, ref:'Income'},
+    Expense: {type:mongoose.Schema.Types.ObjectId, ref:'Expense'},
 })
 
 
@@ -22,6 +23,7 @@ const ExpenseSchema = new mongoose.Schema({
     Date: {type:Date,default:Date.now},
     Amount: {type:Number, required:true},
     Description: {type:String, required:true},
+
 })
 
 const CategorySchema = new mongoose.Schema({
@@ -29,10 +31,15 @@ const CategorySchema = new mongoose.Schema({
     StarDate: {type:Date, required:true},
     EndDate: {type:Date, required:true},
     Money: {type:Number, required:true},
+    Description: {type:String, required:false},
+    Income: {type:mongoose.Schema.Types.ObjectId, ref:'Income'},
+
 })
 
 const ReportSchema = new mongoose.Schema({
     Content: {type:String, required:true},
+    Date: {type:Date, default:Date.now},
+    User: {type:mongoose.Schema.Types.ObjectId, ref:'User'},
    
 })
 
