@@ -1,15 +1,20 @@
 const express = require('express');
 const cors = require('cors');
-// const cate = require('./router/CategoryRouter');
+require("dotenv").config();
+const database = require('./data/data');
 const app = express();
-const { CreateCate } = require('./controller/CateController.js');
-app.post('/createCate', CreateCate);
+const cate = require('./router/CategoryRouter');
+const user = require('./router/UserRouter');
+
+
+
 
 
 app.use(cors());
+app.use(express.urlencoded({extended:false}))
 app.use(express.json());
 
-const PORT = 4000;
+const PORT = process.env.PORT || 5000;
 
 
 app.listen(PORT, () => {
@@ -21,4 +26,6 @@ app.get('/test', (req, res) => {
   res.send('Hello World');
 });
 
-// app.use("/api", cate);
+//routes
+app.use('/API', cate);
+app.use('/API', user);

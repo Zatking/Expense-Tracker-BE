@@ -1,36 +1,39 @@
 const mongoose = require('mongoose');
 
 // Đây là schema cho tài khoản người dùng
-
-
 const UserSchema = new mongoose.Schema({
-    Username:{type:String, required:true},
-    Email:{type:String, required:true,match: [/^\S+@\S+\.\S+$/, 'Invalid email format']},
-    Password:{type:String, required:true},
-    CreatedAt:{type:Date, default:Date.now},
-    Income: {type:mongoose.Schema.Types.ObjectId, ref:'Income'},
-    Expense: {type:mongoose.Schema.Types.ObjectId, ref:'Expense'},
+    userName:{
+        type:String,
+        required:[true, 'Username is required'],
+        unique:true
+    },
+    password:{
+        type:String,
+        required:[true, 'Password is required']
+    },
 })
 
 
 const IncomeSchema = new mongoose.Schema({
     Date: {type:Date,default:Date.now},
-    Amount: {type:Number, required:true},
-    Description: {type:String, required:true},
+    Amount: {type:Number, required:[true, 'Amount is required']},
+    Description: {type:String, required:false},
 })
 
 const ExpenseSchema = new mongoose.Schema({
     Date: {type:Date,default:Date.now},
-    Amount: {type:Number, required:true},
-    Description: {type:String, required:true},
+    Amount: {type:Number, required:[true, 'Amount is required']},
+    Description: {type:String, required:false},
 
 })
 
+
+
 const CategorySchema = new mongoose.Schema({
-    Name: {type:String, required:true},
+    Name: {type:String, required:[true, 'Name is required']},
     StarDate: {type:Date, required:true},
     EndDate: {type:Date, required:true},
-    Money: {type:Number, required:true},
+    Money: {type:Number, required:[true, 'Money is required']},
     Description: {type:String, required:false},
     Income: {type:mongoose.Schema.Types.ObjectId, ref:'Income'},
 
