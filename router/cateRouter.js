@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { CreateCate } = require('../controller/CateController.js');
 
+const {
+    GetCate
+}
+= require('../controller/CateController');
 
-router.post('/createCate  ', CreateCate);
+router.get('/cate', GetCate);
 
 module.exports = router;

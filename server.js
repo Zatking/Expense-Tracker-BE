@@ -3,8 +3,9 @@ const cors = require('cors');
 require("dotenv").config();
 const database = require('./data/data');
 const app = express();
-const cate = require('./router/CategoryRouter');
+const cate = require('./router/cateRouter');
 const user = require('./router/UserRouter');
+const AI = require('./router/AIRouter');
 
 
 
@@ -22,10 +23,18 @@ app.listen(PORT, () => {
 });
 
 
+app.get('/', (req, res) => {
+  res.send('Hello World');
+});
+
+
 app.get('/test', (req, res) => {
   res.send('Hello World');
 });
 
+
+
 //routes
 app.use('/API', cate);
 app.use('/API', user);
+app.use('/API', AI);
