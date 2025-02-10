@@ -16,14 +16,44 @@ const UserSchema = new mongoose.Schema({
 
 
 const IncomeSchema = new mongoose.Schema({
-    Date: {type:Date,default:Date.now},
+    Date: {
+        type: Date,
+        default: Date.now,
+        validate: {
+            validator: function (value) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Xóa giờ phút giây
+
+                const inputDate = new Date(value);
+                inputDate.setHours(0, 0, 0, 0);
+
+                return inputDate.getTime() === today.getTime();
+            },
+            message: "Date must be today",
+        },
+    },
     Money: {type:Number, required:[true, 'Amount is required']},
     Description: {type:String, required:false},
     Category: {type:mongoose.Schema.Types.ObjectId, ref:'Category'}
 })
 
 const ExpenseSchema = new mongoose.Schema({
-    Date: {type:Date,default:Date.now},
+    Date: {
+        type: Date,
+        default: Date.now,
+        validate: {
+            validator: function (value) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Xóa giờ phút giây
+
+                const inputDate = new Date(value);
+                inputDate.setHours(0, 0, 0, 0);
+
+                return inputDate.getTime() === today.getTime();
+            },
+            message: "Date must be today",
+        },
+    },
     Money: {type:Number, required:[true, 'Amount is required']},
     Description: {type:String, required:false},
     Category: {type:mongoose.Schema.Types.ObjectId, ref:'Category'}
@@ -35,7 +65,19 @@ const ExpenseSchema = new mongoose.Schema({
 const CategorySchema = new mongoose.Schema({
     User: {type:mongoose.Schema.Types.ObjectId, ref:'User'},
     Name: {type:String, required:[true, 'Name is required']},
-    StarDate: {type:Date, required:true},
+    StarDate: {type:Date, required:true, default:Date.now,
+        validate: {
+            validator: function (value) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Xóa giờ, phút, giây để so sánh chỉ ngày
+
+                const inputDate = new Date(value);
+                inputDate.setHours(0, 0, 0, 0);
+
+                return inputDate.getTime() === today.getTime();
+        }
+    }
+    },
     EndDate: {type:Date, required:true},
     Money: {type:Number, required:[true, 'Money is required']},
     Description: {type:String, required:false},
