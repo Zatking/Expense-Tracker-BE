@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
-const Income = require("../models/Income"); // Import schema Income
-const Category = require("../models/Category"); // Import schema Category
+const Income = require("../../schema/schema").Income; // Import schema Income
+const Category = require("../../schema/schema").Category; // Import schema Category
 
 let mongoServer;
 

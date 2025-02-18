@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
-const Expense = require("../models/Expense"); // Import schema Expense
-const Category = require("../models/Category"); // Import schema Category
+const Expense = require("../../schema/schema").Expense; // Import schema Expense
+const Category = require("../../schema/schema").Category; // Import schema Category
 
 let mongoServer;
 

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
-const Category = require("../models/Category");
-const User = require("../models/User");
+const Category = require("../../schema/schema").Category;
+const User = require("../../schema/schema").User;
 
 let mongoServer;
 
