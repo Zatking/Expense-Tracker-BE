@@ -1,7 +1,6 @@
 const User = require('../schema/schema').User;
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-
+const bcrypt = require('bcryptjs');
 
 //API Register user
 const createUser = async (req, res) => {

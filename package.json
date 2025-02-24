@@ -2,6 +2,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@testdeck/mocha": "^0.3.3",
+    "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
     "chai": "^5.1.2",
     "cors": "^2.8.5",
