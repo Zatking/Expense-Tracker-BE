@@ -14,51 +14,14 @@ const UserSchema = new mongoose.Schema({
     },
 })
 
-
-const IncomeSchema = new mongoose.Schema({
-    Date: {
-        type: Date,
-        default: Date.now,
-        validate: {
-            validator: function (value) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0); // Xóa giờ phút giây
-
-                const inputDate = new Date(value);
-                inputDate.setHours(0, 0, 0, 0);
-
-                return inputDate.getTime() === today.getTime();
-            },
-            message: "Date must be today",
-        },
-    },
-    Money: {type:Number, required:[true, 'Amount is required']},
-    Description: {type:String, required:false},
-    Category: {type:mongoose.Schema.Types.ObjectId, ref:'Category'}
+const transactionSchema = new mongoose.Schema({
+    type:{type:String, required:true},
+    totalMoney:{type:Number, required:true},
+    description:{type:String, required:true},
+    date:{type:Date, required:true},
+    transactionType:{type:String, required:true, enum:['Income', 'Expense']},
 })
 
-const ExpenseSchema = new mongoose.Schema({
-    Date: {
-        type: Date,
-        default: Date.now,
-        validate: {
-            validator: function (value) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0); // Xóa giờ phút giây
-
-                const inputDate = new Date(value);
-                inputDate.setHours(0, 0, 0, 0);
-
-                return inputDate.getTime() === today.getTime();
-            },
-            message: "Date must be today",
-        },
-    },
-    Money: {type:Number, required:[true, 'Amount is required']},
-    Description: {type:String, required:false},
-    Category: {type:mongoose.Schema.Types.ObjectId, ref:'Category'}
-
-})
 
 
 
@@ -107,20 +70,19 @@ const generatedContentSchema = new mongoose.Schema({
 
 //Models
 
-const Income = mongoose.model('Income', IncomeSchema);
-const Expense = mongoose.model('Expense', ExpenseSchema);
+
 const Category = mongoose.model('Category', CategorySchema);
 const Report = mongoose.model('Report', ReportSchema);
 const User = mongoose.model('User', UserSchema);
 const GeneratedContent  = mongoose.model('Content', generatedContentSchema);
+const Transaction = mongoose.model('Transaction', transactionSchema);
 
 
 
 module.exports = {
     User,
-    Income,
-    Expense,
     Category,
     Report,
-    GeneratedContent 
+    GeneratedContent,
+    Transaction
 }
