@@ -61,13 +61,26 @@ const generateContent = async (req, res) => {
         .json({ error: "Dữ liệu transaction không hợp lệ." });
     }
 
+  
     const newTransaction = new Transaction({
       type,
       totalMoney,
       description,
-      date: new Date(date), // Chuyển đổi đúng định dạng
+      date, // Chuyển đổi đúng định dạng
       transactionType,
     });
+
+    const existingTransaction = await Transaction.findOne({
+      type,
+      totalMoney,
+      description,
+      date,
+      transactionType,
+    });
+
+    if(existingTransaction){
+      return res.status(400).json({ error: "Transaction đã tồn tại" });
+    }
 
     console.log("Transaction mới:", newTransaction);
 
