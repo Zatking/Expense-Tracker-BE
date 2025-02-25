@@ -18,7 +18,7 @@ const generateContent = async (req, res) => {
         description:(description là mô tả về hóa đơn ví dụ như:"Mua sắm tại siêu thị Coopmart","Đi ăn tại nhà hàng ABC","
         Đi khám bệnh tại bệnh viện X","Nhận lương tháng 10"...),
         date:(date là ngày tháng năm trên hóa đơn lấy theo giờ UTC ví dụ như:"2024-12-31T17:00:00.000+00:00"...),
-        transactionType:(transactionType là loại giao dịch ví dụ như:"Income","Expense")) `;
+        transactionType:(transactionType là loại giao dịch ví dụ như:"Income","Expense")) chỉ chứa các giá trị tôi yêu cầu không thêm hoặc bớt giá trị`;
 
     console.log("Prompt cuối cùng:", finalPrompt);
 
