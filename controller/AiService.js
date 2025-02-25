@@ -12,15 +12,16 @@ const generateContent = async (req, res) => {
     }
 
     const cleanUserPrompt = userPrompt.replace(/\n+/g, " ").trim();
+    console.log("Prompt sau khi làm sạch:", cleanUserPrompt);
 
     // 🔹 Chuẩn bị Prompt cho AI
-    const finalPrompt = `CChuyển đổi đoạn văn bản sau thành JSON giúp tôi:"${cleanUserPrompt}".Đảm bảo rằng đoạn văn bản trả về cho 
+    const finalPrompt = `Chuyển đổi đoạn văn bản sau thành JSON giúp tôi:"${cleanUserPrompt}".Đảm bảo rằng đoạn văn bản trả về cho 
         tôi đúng cấu trúc sau:'transaction ' (Trong mỗi transaction  có các trường như type:(type là loại hoán đơn ví dụ như
-        :"Mua Sắm","Ăn Uống","Bệnh viện","Tiền lương"...),totalMoney:(totalMoney là tổng số tiền trên hóa đơn,),
-        description:(description là mô tả về hóa đơn ví dụ như:"Mua sắm tại siêu thị Coopmart","Đi ăn tại nhà hàng ABC","
+        :"Mua Sắm","Ăn Uống","Bệnh viện","Tiền lương"...),totalMoney:(totalMoney là tổng số tiền trên hóa đơn) nếu tổng tiền không phải tiền việt chuyển đổi sang tiền việt,
+        description:(description là mô tả về hóa đơn sử dụng ở đâu ví dụ như:"Mua sắm tại siêu thị Coopmart","Đi ăn tại nhà hàng ABC","
         Đi khám bệnh tại bệnh viện X","Nhận lương tháng 10"...),
-        date:(date là ngày tháng năm trên hóa đơn lấy theo giờ UTC ví dụ như:"2024-12-31T17:00:00.000+00:00"...),
-        transactionType:(transactionType là loại giao dịch ví dụ như:"Income","Expense")) chỉ chứa các giá trị tôi yêu cầu không thêm hoặc bớt giá trị`;
+        date:(date là ngày tháng năm trên hóa đơn lấy theo giờ UTC ví dụ như:"2024-12-31T17:00:00.000+00:00"...) nếu không có date thì date là ngày hiện tại,
+        transactionType:(transactionType là loại giao dịch ví dụ như:"Income","Expense")) chỉ trả về các giá trị mà tôi yêu cầu không trả lời gì thêm`;
 
     console.log("Prompt cuối cùng:", finalPrompt);
 
