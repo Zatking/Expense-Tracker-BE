@@ -11,8 +11,10 @@ const generateContent = async (req, res) => {
       return res.status(400).json({ error: "Prompt không được để trống." });
     }
 
+    const cleanUserPrompt = userPrompt.replace(/\n+/g, " ").trim();
+
     // 🔹 Chuẩn bị Prompt cho AI
-    const finalPrompt = `CChuyển đổi đoạn văn bản sau thành JSON giúp tôi:"${userPrompt}".Đảm bảo rằng đoạn văn bản trả về cho 
+    const finalPrompt = `CChuyển đổi đoạn văn bản sau thành JSON giúp tôi:"${cleanUserPrompt}".Đảm bảo rằng đoạn văn bản trả về cho 
         tôi đúng cấu trúc sau:'transaction ' (Trong mỗi transaction  có các trường như type:(type là loại hoán đơn ví dụ như
         :"Mua Sắm","Ăn Uống","Bệnh viện","Tiền lương"...),totalMoney:(totalMoney là tổng số tiền trên hóa đơn,),
         description:(description là mô tả về hóa đơn ví dụ như:"Mua sắm tại siêu thị Coopmart","Đi ăn tại nhà hàng ABC","
