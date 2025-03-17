@@ -23,7 +23,6 @@ const generateContent = async (req, res) => {
         date:(date là ngày tháng năm trên hóa đơn lấy theo giờ UTC ví dụ như:"2024-12-31T17:00:00.000+00:00"...) nếu không có date thì date là ngày hiện tại,
         transactionType:(transactionType là loại giao dịch ví dụ như:"Income","Expense")) chỉ trả về các giá trị mà tôi yêu cầu không trả lời gì thêm`;
 
-    console.log("Prompt cuối cùng:", finalPrompt);
 
     // 🔹 Gọi AI Model
     const model = AI.getGenerativeModel({ model: "gemini-1.5-flash" });
