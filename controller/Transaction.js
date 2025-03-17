@@ -2,7 +2,7 @@ const Transaction = require("../schema/schema").Transaction;
 
 const createTransaction = async (req, res) => {
   const existTransaction = await Transaction.findOne({
-    userId: req.body.userId,
+    userID: req.body.userId,
     type: req.body.type,
     totalMoney: req.body.totalMoney,
     description: req.body.description,
