@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require("dotenv").config();
 const app = express();
-const user = require('./router/UserRouter');
 const AI = require('./router/AIRouter');
 const transaction = require('./router/TransactionRouter');
 const data=require('./data/data');
@@ -35,6 +34,5 @@ app.get('/test', (req, res) => {
 
 
 //routes
-app.use('/API', user);
 app.use('/API', AI);
 app.use('/API', transaction);
