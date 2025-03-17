@@ -12,7 +12,7 @@ const generateContent = async (req, res) => {
     }
 
     const cleanUserPrompt = userPrompt.replace(/\n+/g, " ").trim();
-    console.log("Prompt sau khi làm sạch:", cleanUserPrompt);
+    console.log("userPrompt sau khi làm sạch:", cleanUserPrompt);
 
     // 🔹 Chuẩn bị Prompt cho AI
     const finalPrompt = `Chuyển đổi đoạn văn bản sau thành JSON giúp tôi:"${cleanUserPrompt}".Đảm bảo rằng đoạn văn bản trả về cho 
