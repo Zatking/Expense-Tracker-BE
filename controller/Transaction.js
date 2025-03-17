@@ -2,7 +2,7 @@ const Transaction = require("../schema/schema").Transaction;
 
 const createTransaction = async (req, res) => {
   const existTransaction = await Transaction.findOne({
-    userID: req.body.userId,
+    userID: req.body.userID,
     type: req.body.type,
     totalMoney: req.body.totalMoney,
     description: req.body.description,
@@ -12,10 +12,10 @@ const createTransaction = async (req, res) => {
     return res.status(400).json({ error: "Transaction already exists" });
   }
   try {
-    const { userId, type, totalMoney, description, date, transactionType } =
+    const { userID, type, totalMoney, description, date, transactionType } =
       req.body;
     const newTransaction = new Transaction({
-      userId,
+      userID,
       type,
       totalMoney,
       description,
@@ -36,7 +36,7 @@ const editTransaction = async (req, res) => {
     if (!transaction) {
       return res.status(404).json({ message: "Không tìm thấy giao dịch" });
     }
-    transaction.userId = req.body.userId;
+    transaction.userID = req.body.userID;
     transaction.type = req.body.type;
     transaction.totalMoney = req.body.totalMoney;
     transaction.description = req.body.description;
@@ -105,7 +105,7 @@ const getTransactionByMonth = async (req, res) => {
 
 const getTransactionUser = async (req, res) => {
   try {
-    const transaction = await Transaction.find({ userID: req.body.userId });
+    const transaction = await Transaction.find({ userID: req.body.userID });
     res.status(200).json(transaction);
   } catch (error) {
     res.status(500).json({ message: error.message });
