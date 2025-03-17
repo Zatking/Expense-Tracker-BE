@@ -53,50 +53,7 @@ const generateContent = async (req, res) => {
         .status(500)
         .json({ error: "Dữ liệu không chứa transaction hợp lệ." });
     }
-
-    const { type, totalMoney, description, date, transactionType } =
-      resultJson.transaction;
-
-    // 🔹 Kiểm tra lại kiểu dữ liệu trước khi lưu
-    if (typeof totalMoney !== "number" || isNaN(Date.parse(date))) {
-      return res
-        .status(400)
-        .json({ error: "Dữ liệu transaction không hợp lệ." });
-    }
-
-  
-    const newTransaction = new Transaction({
-      type,
-      totalMoney,
-      description,
-      date, // Chuyển đổi đúng định dạng
-      transactionType,
-    });
-
-    const existingTransaction = await Transaction.findOne({
-      type,
-      totalMoney,
-      description,
-      date,
-      transactionType,
-    });
-
-    if(existingTransaction){
-      return res.status(400).json({ error: "Transaction đã tồn tại" });
-    }
-
-    console.log("Transaction mới:", newTransaction);
-
-    // 🔹 Lưu vào MongoDB
-    try {
-      await newTransaction.save();
-      console.log("Lưu giao dịch thành công:", newTransaction);
-    } catch (dbError) {
-      console.error("Lỗi khi lưu MongoDB:", dbError);
-      return res.status(500).json({ error: `Lỗi MongoDB: ${dbError.message}` });
-    }
-
-    res.status(200).json({ result: newTransaction });
+    res.status(200).json({ result: resultJson.transaction });
   } catch (error) {
     console.error("Lỗi trong quá trình xử lý:", error);
     res.status(500).json({ error: `Lỗi khi xử lý AI: ${error.message}` });

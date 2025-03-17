@@ -14,7 +14,7 @@ const {
 
 router.post('/createTransaction', createTransaction);
 router.put('/editTransaction', editTransaction);
-router.get('/transactionUser', getTransactionUser);
+router.get('/getTransactionUser', getTransactionUser);
 router.get('/transaction', getTransaction);
 router.get('/transactionExpense', getExpenseTransaction);
 router.get('/transactionIncome', getIncomeTransaction);
