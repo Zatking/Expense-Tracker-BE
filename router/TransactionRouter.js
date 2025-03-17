@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const {
-    createTransactionExpense,
-    createTransactionIncome,
+    createTransaction,
+    editTransaction,
+    getTransactionUser,
     getTransaction,
     getExpenseTransaction,
     getIncomeTransaction,
@@ -11,8 +12,9 @@ const {
 }= require('../controller/Transaction');
 
 
-router.post('/transactionIncome', createTransactionIncome);
-router.post('/transactionExpense', createTransactionExpense);
+router.post('/createTransaction', createTransaction);
+router.put('/editTransaction', editTransaction);
+router.get('/transactionUser', getTransactionUser);
 router.get('/transaction', getTransaction);
 router.get('/transactionExpense', getExpenseTransaction);
 router.get('/transactionIncome', getIncomeTransaction);
