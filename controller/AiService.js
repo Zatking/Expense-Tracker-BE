@@ -17,7 +17,7 @@ const generateContent = async (req, res) => {
     // 🔹 Chuẩn bị Prompt cho AI
     const finalPrompt = `Chuyển đổi đoạn văn bản sau thành JSON giúp tôi:"${cleanUserPrompt}".Đảm bảo rằng đoạn văn bản trả về cho 
         tôi đúng cấu trúc sau:'transaction ' (Trong mỗi transaction  có các trường như type:(type là loại hoán đơn ví dụ như
-        :"Mua Sắm","Ăn Uống","Bệnh viện","Tiền lương"...),totalMoney:(totalMoney là tổng số tiền trên hóa đơn) nếu tổng tiền không phải tiền việt chuyển đổi sang tiền việt,
+        :"Mua Sắm","Ăn Uống","Bệnh viện","Tiền lương"...),totalMoney:(totalMoney là tổng số tiền trên hóa đơn ) nếu tổng tiền không phải tiền việt chuyển đổi sang tiền việt,
         description:(description là mô tả về hóa đơn sử dụng ở đâu ví dụ như:"Mua sắm tại siêu thị Coopmart","Đi ăn tại nhà hàng ABC","
         Đi khám bệnh tại bệnh viện X","Nhận lương tháng 10"...),
         date:(date là ngày tháng năm trên hóa đơn lấy theo giờ UTC ví dụ như:"2024-12-31T17:00:00.000+00:00"...) nếu không có date thì date là ngày hiện tại,
