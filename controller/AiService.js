@@ -1,77 +1,90 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const GeneratedContent = require("../schema/schema").GeneratedContent;
-const Transaction = require("../schema/schema").Transaction;
+const { GeneratedContent, Transaction } = require("../schema/schema");
 
 const AI = new GoogleGenerativeAI(process.env.AI_KEY);
 
 const generateContent = async (req, res) => {
   try {
-    const { userPrompt } = req.body;
-    if (!userPrompt) {
-      return res.status(400).json({ error: "Prompt không được để trống." });
-    }
+    const { userPrompt, userID } = req.body;
+
+    if (!userPrompt) return res.status(400).json({ error: "Prompt không được để trống." });
+    if (!userID) return res.status(400).json({ error: "UserID không hợp lệ." });
 
     const cleanUserPrompt = userPrompt.replace(/\n+/g, " ").trim();
     console.log("userPrompt sau khi làm sạch:", cleanUserPrompt);
 
-    // 🔹 Chuẩn bị Prompt cho AI
-    const finalPrompt = `Chuyển đổi đoạn văn bản sau thành JSON giúp tôi:"${cleanUserPrompt}".Đảm bảo rằng đoạn văn bản trả về cho 
-        tôi đúng cấu trúc sau:'transaction ' (Trong mỗi transaction  có các trường như type:(type là loại hoán đơn ví dụ như
-        :"Mua Sắm","Ăn Uống","Bệnh viện","Tiền lương"...),totalMoney:(totalMoney là tổng số tiền trên hóa đơn ) nếu tổng tiền không phải tiền việt chuyển đổi sang tiền việt,
-        description:(description là mô tả về hóa đơn sử dụng ở đâu ví dụ như:"Mua sắm tại siêu thị Coopmart","Đi ăn tại nhà hàng ABC","
-        Đi khám bệnh tại bệnh viện X","Nhận lương tháng 10"...),
-        date:(date là ngày tháng năm trên hóa đơn lấy theo giờ UTC ví dụ như:"2024-12-31T17:00:00.000+00:00"...) nếu không có date thì date là ngày hiện tại,
-        transactionType:(transactionType là loại giao dịch  nếu là "hóa đơn Thu nhập" thì là "Income"
-         hoặc "hóa đơn Thanh toán" thì là "Expense"  )) chỉ trả về các giá trị mà tôi yêu cầu không trả lời gì thêm`;
+    // 🔹 Prompt yêu cầu AI xử lý
+    const finalPrompt = `Chuyển đổi đoạn văn bản sau thành JSON giúp tôi: "${cleanUserPrompt}". 
+      Đảm bảo rằng JSON có cấu trúc 'transaction' với các trường sau:
+      - type: Loại hóa đơn (ví dụ: "Mua Sắm", "Ăn Uống", "Bệnh viện", "Tiền lương").
+      - totalMoney: Tổng số tiền trên hóa đơn. Nếu không phải tiền Việt Nam (VND), hãy chuyển đổi sang VND.
+      - description: Mô tả hóa đơn (ví dụ: "Mua sắm tại siêu thị Coopmart").
+      - date: Ngày tháng năm theo UTC format "YYYY-MM-DDTHH:mm:ss.sssZ". Nếu không có, hãy dùng ngày hiện tại.
+      - transactionType: "Income" (thu nhập) hoặc "Expense" (chi tiêu).
+      Chỉ trả về JSON, không trả lời gì thêm.`;
 
     // 🔹 Gọi AI Model
     const model = AI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(finalPrompt);
 
-    // 🔹 Kiểm tra dữ liệu AI trả về
-    console.log("Dữ liệu trả về từ AI:", JSON.stringify(result, null, 2));
-    let resultText = result.response.text();
-
-    // 🔹 Làm sạch dữ liệu JSON
-    resultText = resultText.replace(/```json|```/g, "").trim();
-    console.log("Dữ liệu sau khi làm sạch:", resultText);
-
-    let resultJson;
+    let result;
     try {
-      resultJson = JSON.parse(resultText);
+      result = await model.generateContent(finalPrompt);
     } catch (error) {
-      console.error("Lỗi khi phân tích JSON:", error.message);
-      return res
-        .status(500)
-        .json({ error: `Lỗi phân tích JSON: ${error.message}` });
+      console.error("Lỗi khi gọi AI:", error);
+      return res.status(500).json({ error: "Lỗi khi kết nối với AI" });
     }
+
+    let resultText = result?.response?.text()?.replace(/```json|```/g, "").trim();
+    if (!resultText) {
+      return res.status(500).json({ error: "AI không trả về dữ liệu hợp lệ." });
+    }
+
+    console.log("Dữ liệu từ AI:", resultText);
 
     // 🔹 Kiểm tra JSON hợp lệ
-    if (!resultJson.transaction) {
-      return res
-        .status(500)
-        .json({ error: "Dữ liệu không chứa transaction hợp lệ." });
-    }
-    const { type, totalMoney, description, date, transactionType } =
-      resultJson.transaction;
-
-    // 🔹 Kiểm tra lại kiểu dữ liệu trước khi lưu
-    if (typeof totalMoney !== "number" || isNaN(Date.parse(date))) {
-      return res
-        .status(400)
-        .json({ error: "Dữ liệu transaction không hợp lệ." });
+    let transactionData;
+    try {
+      transactionData = JSON.parse(resultText)?.transaction;
+      if (!transactionData) throw new Error("Dữ liệu không chứa transaction hợp lệ.");
+    } catch (error) {
+      return res.status(500).json({ error: `Lỗi phân tích JSON: ${error.message}` });
     }
 
+    const { type, totalMoney, description, date, transactionType } = transactionData;
+
+    // 🔹 Kiểm tra dữ liệu đầu vào
+    if (!type || !description || !transactionType) {
+      return res.status(400).json({ error: "Thiếu thông tin giao dịch." });
+    }
+    if (typeof totalMoney !== "number" || totalMoney <= 0) {
+      return res.status(400).json({ error: "Tổng số tiền không hợp lệ." });
+    }
+    if (!Date.parse(date)) {
+      return res.status(400).json({ error: "Ngày giao dịch không hợp lệ." });
+    }
+
+    // 🔹 Kiểm tra transaction đã tồn tại
+    try {
+      const existingTransaction = await Transaction.findOne({
+        userID,
+        type,
+        totalMoney,
+        description,
+        date,
+        transactionType,
+      });
+
+      if (existingTransaction) {
+        return res.status(400).json({ error: "Transaction đã tồn tại." });
+      }
+    } catch (error) {
+      console.error("Lỗi kiểm tra transaction:", error);
+      return res.status(500).json({ error: "Lỗi khi kiểm tra transaction" });
+    }
+
+    // 🔹 Lưu vào MongoDB
     const newTransaction = new Transaction({
-      userID:req.body.userID,
-      type,
-      totalMoney,
-      description,
-      date, // Chuyển đổi đúng định dạng
-      transactionType,
-    });
-
-    const existingTransaction = await Transaction.findOne({
+      userID,
       type,
       totalMoney,
       description,
@@ -79,20 +92,8 @@ const generateContent = async (req, res) => {
       transactionType,
     });
 
-    if (existingTransaction) {
-      return res.status(400).json({ error: "Transaction đã tồn tại" });
-    }
-
-    console.log("Transaction mới:", newTransaction);
-
-    // 🔹 Lưu vào MongoDB
-    try {
-      await newTransaction.save();
-      console.log("Lưu giao dịch thành công:", newTransaction);
-    } catch (dbError) {
-      console.error("Lỗi khi lưu MongoDB:", dbError);
-      return res.status(500).json({ error: `Lỗi MongoDB: ${dbError.message}` });
-    }
+    await newTransaction.save();
+    console.log("Lưu giao dịch thành công:", newTransaction);
 
     res.status(200).json({ result: newTransaction });
   } catch (error) {
@@ -101,6 +102,4 @@ const generateContent = async (req, res) => {
   }
 };
 
-module.exports = {
-  generateContent,
-};
+module.exports = { generateContent };

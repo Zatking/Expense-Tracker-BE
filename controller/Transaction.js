@@ -1,19 +1,42 @@
 const Transaction = require("../schema/schema").Transaction;
 
 const createTransaction = async (req, res) => {
-  const existTransaction = await Transaction.findOne({
-    userID: req.body.userID,
-    type: req.body.type,
-    totalMoney: req.body.totalMoney,
-    description: req.body.description,
-    date: req.body.date,
-  });
-  if (existTransaction) {
-    return res.status(400).json({ error: "Transaction already exists" });
-  }
   try {
     const { userID, type, totalMoney, description, date, transactionType } =
       req.body;
+
+    // 🔹 Kiểm tra dữ liệu đầu vào
+    if (!userID || !type || !totalMoney || !description || !date || !transactionType) {
+      return res.status(400).json({
+        error: "Transaction thiếu thông tin. Vui lòng cung cấp đủ thông tin!",
+      });
+    }
+
+    // 🔹 Kiểm tra nếu số tiền âm
+    if (totalMoney < 0) {
+      return res.status(401).json({ message: "Số tiền không hợp lệ" });
+    }
+
+    // 🔹 Kiểm tra loại giao dịch hợp lệ
+    if (transactionType !== "Income" && transactionType !== "Expense") {
+      return res.status(401).json({ message: "Loại giao dịch không hợp lệ" });
+    }
+
+    // 🔹 Kiểm tra nếu giao dịch đã tồn tại
+    const existTransaction = await Transaction.findOne({
+      userID,
+      type,
+      totalMoney,
+      description,
+      date,
+      transactionType,
+    });
+
+    if (existTransaction) {
+      return res.status(400).json({ error: "Transaction đã tồn tại" });
+    }
+
+    // 🔹 Lưu giao dịch mới
     const newTransaction = new Transaction({
       userID,
       type,
@@ -22,33 +45,47 @@ const createTransaction = async (req, res) => {
       date,
       transactionType,
     });
+
     await newTransaction.save();
-    console.log("Transaction mới:", newTransaction);
+    console.log("Lưu giao dịch thành công:", newTransaction);
     res.status(201).json(newTransaction);
   } catch (error) {
+    console.error("🔥 Lỗi trong createTransaction:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 const editTransaction = async (req, res) => {
   try {
-    const transaction = await Transaction.findById(req.body.userID);
-    if (!transaction) {
-      return res.status(404).json({ message: "Không tìm thấy giao dịch" });
+    const { userID, _id, type, totalMoney, description, date, transactionType } = req.body;
+
+    // Kiểm tra dữ liệu đầu vào
+    if (totalMoney < 0) {
+      return res.status(400).json({ message: "Số tiền không hợp lệ" });
     }
-    transaction.userID = req.body.userID;
-    transaction.type = req.body.type;
-    transaction.totalMoney = req.body.totalMoney;
-    transaction.description = req.body.description;
-    transaction.date = req.body.date;
-    transaction.transactionType = req.body.transactionType;
-    await transaction.save();
-    res.status(200).json(transaction);
+    if (!["Income", "Expense"].includes(transactionType)) {
+      return res.status(400).json({ message: "Loại giao dịch không hợp lệ" });
+    }
+
+    // Kiểm tra giao dịch có tồn tại không
+    const transaction = await Transaction.findOne({ userID, _id });
+    if (!transaction) {
+      return res.status(404).json({ message: "Giao dịch không tồn tại" });
+    }
+
+    // Cập nhật giao dịch và lấy dữ liệu mới nhất
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      { userID, _id },
+      { type, totalMoney, description, date, transactionType },
+      { new: true } // Trả về dữ liệu sau khi cập nhật
+    );
+
+    res.status(200).json(updatedTransaction);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 
 const getTransaction = async (req, res) => {
@@ -62,19 +99,21 @@ const getTransaction = async (req, res) => {
 
 const getExpenseTransaction = async (req, res) => {
   try {
-    const transaction = await Transaction.find({ transactionType: "Expense" });
-    res.status(200).json(transaction);
+    const transactions = await Transaction.find({ transactionType: "Expense" });
+    return res.status(200).json(transactions);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Lỗi khi lấy danh sách Expense:", error);
+    return res.status(500).json({ message: "Lỗi server khi lấy giao dịch Expense" });
   }
 };
 
 const getIncomeTransaction = async (req, res) => {
   try {
-    const transaction = await Transaction.find({ transactionType: "Income" });
-    res.status(200).json(transaction);
+    const transactions = await Transaction.find({ transactionType: "Income" });
+    return res.status(200).json(transactions);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Lỗi khi lấy danh sách Income:", error);
+    return res.status(500).json({ message: "Lỗi server khi lấy giao dịch Income" });
   }
 };
 
@@ -97,6 +136,10 @@ const getTransactionByMonth = async (req, res) => {
       date: { $gte: startDate, $lt: endDate },
     });
 
+    if(transactions.length === 0) {
+      return res.status(404).json({ message: "Không có giao dịch nào trong tháng này." });
+    }
+
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -104,8 +147,15 @@ const getTransactionByMonth = async (req, res) => {
 };
 
 const getTransactionUser = async (req, res) => {
+  const userID = req.body.userID;
+  if(!userID) {
+    return res.status(400).json({ message: "Vui lòng cung cấp ID người dùng." });
+  }
   try {
-    const transaction = await Transaction.find({ userID: req.body.userID });
+    const transaction = await Transaction.find({ userID: userID });
+    if(transaction.length === 0) {
+      return res.status(404).json({ message: "Không có giao dịch nào cho người dùng này." });
+    }
     res.status(200).json(transaction);
   } catch (error) {
     res.status(500).json({ message: error.message });
