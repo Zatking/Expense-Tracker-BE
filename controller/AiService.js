@@ -17,7 +17,7 @@ const generateContent = async (req, res) => {
     const finalPrompt = `Chuyển đổi đoạn văn bản sau thành JSON giúp tôi: "${cleanUserPrompt}". 
       Đảm bảo rằng JSON có cấu trúc 'transaction' với các trường sau:
       - type: Loại hóa đơn (ví dụ: "Mua Sắm", "Ăn Uống", "Bệnh viện", "Tiền lương").
-      - totalMoney: Tổng số tiền trên hóa đơn. Nếu không phải tiền Việt Nam (VND), hãy chuyển đổi sang VND.
+      - totalMoney: Tổng số tiền trên hóa đơn. Nếu ngôn ngữ là thái thì đổi tổng tiền từ tiền thái sang tiền việt, ví dụ: ฿1 THB = ₫754,7 VND (tỷ lệ thái sang việt), 1¥ =3,350CNY . Làm tương tự đối với ngôn ngữ khác
       - description: Mô tả hóa đơn (ví dụ: "Mua sắm tại siêu thị Coopmart").
       - date: Ngày tháng năm theo UTC format "YYYY-MM-DDTHH:mm:ss.sssZ". Nếu không có, hãy dùng ngày hiện tại.
       - transactionType: "Income" (thu nhập) hoặc "Expense" (chi tiêu).

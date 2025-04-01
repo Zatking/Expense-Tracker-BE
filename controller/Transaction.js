@@ -55,6 +55,100 @@ const createTransaction = async (req, res) => {
   }
 };
 
+const getExpenseTransactionNow = async(req,res) =>{
+  try {
+    const { userID } = req.body;
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    const expenseTransaction = await Transaction.find({ userID, type: "Expense", date: { $gte: startOfDay, $lt: endOfDay } });
+    if (expenseTransaction.length === 0) {
+      return res.status(404).json({ message: "Không có giao dịch nào trong ngày hôm nay." });
+    }
+    res.status(200).json(expenseTransaction);
+    
+  }catch (error) {
+    console.error("Lỗi khi lấy danh sách Expense:", error);
+    return res.status(500).json({ message: "Lỗi server khi lấy giao dịch Expense" });
+  }
+}
+
+const totalMoney= async(req,res) =>{
+  try{
+    const {userID}=req.body;
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    // Tính tổng tiền sử dụng trong tháng nếu như là income thì cộng expense thì trử
+    const expenseMoney = await Transaction.aggregate([
+      { $match: { userID, type: "Expense", date: { $gte: startOfDay, $lt: endOfDay } } },
+      { $group: { _id: null, totalMoney: { $sum: "$totalMoney" } } }
+    ]);
+    const incomeMoney = await Transaction.aggregate([
+      { $match: { userID, type: "Income", date: { $gte: startOfDay, $lt: endOfDay } } },
+      { $group: { _id: null, totalMoney: { $sum: "$totalMoney" } } }
+    ]);
+    const totalMoney = incomeMoney[0]?.totalMoney - expenseMoney[0]?.totalMoney || 0;
+    res.status(200).json({ totalMoney });
+  }
+  catch (error) {
+    console.error("Lỗi khi tính tổng tiền:", error);
+    return res.status(500).json({ message: "Lỗi server khi tính tổng tiền" });
+  }
+}
+
+const getIncomeTransactionNow = async(req,res) =>{
+  try {
+    const { userID } = req.body;
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    const expenseTransaction = await Transaction.find({ userID, type: "Income", date: { $gte: startOfDay, $lt: endOfDay } });
+    if (expenseTransaction.length === 0) {
+      return res.status(404).json({ message: "Không có giao dịch nào trong ngày hôm nay." });
+    }
+    res.status(200).json(expenseTransaction);
+    
+  }catch (error) {
+    console.error("Lỗi khi lấy danh sách Expense:", error);
+    return res.status(500).json({ message: "Lỗi server khi lấy giao dịch Expense" });
+  }
+}
+
+const totalMoneyIncome = async(req,res) =>{
+  try{
+    const {userID}=req.body;
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    // Tính tổng tiền Income
+    const incomeMoney = await Transaction.aggregate([
+      { $match: { userID, type: "Income", date: { $gte: startOfDay, $lt: endOfDay } } },
+      { $group: { _id: null, totalMoney: { $sum: "$totalMoney" } } }
+    ]);
+    const totalMoney = incomeMoney[0]?.totalMoney || 0;
+    res.status(200).json({ totalMoney });
+  }catch (error) {
+    console.error("Lỗi khi tính tổng tiền:", error);}}
+
+const totalMoneyExpense = async(req,res) =>{
+  try{
+    const {userID}=req.body;
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    // Tính tổng tiền Expense
+    const expenseMoney = await Transaction.aggregate([
+      { $match: { userID, type: "Expense", date: { $gte: startOfDay, $lt: endOfDay } } },
+      { $group: { _id: null, totalMoney: { $sum: "$totalMoney" } } }
+    ]);
+    const totalMoney = expenseMoney[0]?.totalMoney || 0;
+    res.status(200).json({ totalMoney });
+  }catch (error) {
+    console.error("Lỗi khi tính tổng tiền:", error);
+    return res.status(500).json({ message: "Lỗi server khi tính tổng tiền" });
+  }
+}
 
 const editTransaction = async (req, res) => {
   try {
@@ -170,4 +264,9 @@ module.exports = {
   getExpenseTransaction,
   getIncomeTransaction,
   getTransactionByMonth,
+  getExpenseTransactionNow,
+  getIncomeTransactionNow,
+  totalMoney,
+  totalMoneyIncome,
+  totalMoneyExpense,
 };

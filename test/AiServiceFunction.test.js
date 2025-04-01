@@ -61,4 +61,6 @@ describe("Test generateContent function", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "UserID không hợp lệ." });
   });
+
+  it("")
 });
