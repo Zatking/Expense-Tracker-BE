@@ -269,4 +269,6 @@ module.exports = {
   totalMoney,
   totalMoneyIncome,
   totalMoneyExpense,
+  getIncomeTransactionNow,
+  getExpenseTransactionNow,
 };

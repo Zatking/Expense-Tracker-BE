@@ -14,6 +14,8 @@ const {
     totalMoneyExpense,
     totalMoneyIncome,
     totalMoney,
+    getExpenseTransactionNow,
+    getIncomeTransactionNow,
 }= require('../controller/Transaction');
 
 
@@ -29,5 +31,6 @@ router.get('/transactionIncomeNow', getIncomeTransactionNow);
 router.get('/totalMoneyExpense', totalMoneyExpense);
 router.get('/totalMoneyIncome', totalMoneyIncome);
 router.get('/totalMoney', totalMoney);
-
+router.get('/getExpense', getExpenseTransactionNow);
+router.get('/getIncome', getIncomeTransactionNow);
 module.exports = router;
