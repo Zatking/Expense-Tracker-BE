@@ -8,14 +8,7 @@ const {
     getTransaction,
     getExpenseTransaction,
     getIncomeTransaction,
-    getTransactionByMonth,
-    getExpenseTransactionNow,
-    getIncomeTransactionNow,
-    totalMoneyExpense,
-    totalMoneyIncome,
-    totalMoney,
-    getExpenseTransactionNow,
-    getIncomeTransactionNow,
+    getTransactionByMonth
 }= require('../controller/Transaction');
 
 
@@ -26,11 +19,5 @@ router.get('/transaction', getTransaction);
 router.get('/transactionExpense', getExpenseTransaction);
 router.get('/transactionIncome', getIncomeTransaction);
 router.get('/transactionByMonth', getTransactionByMonth);
-router.get('/transactionExpenseNow', getExpenseTransactionNow);
-router.get('/transactionIncomeNow', getIncomeTransactionNow);
-router.get('/totalMoneyExpense', totalMoneyExpense);
-router.get('/totalMoneyIncome', totalMoneyIncome);
-router.get('/totalMoney', totalMoney);
-router.get('/getExpense', getExpenseTransactionNow);
-router.get('/getIncome', getIncomeTransactionNow);
+
 module.exports = router;
